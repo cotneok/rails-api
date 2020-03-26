@@ -5,33 +5,19 @@ class Api::V1::RegistrationsController < Devise::RegistrationsController
   def create
     user = User.new(user_params)
     if user.save
-      render json: {
-        message: "Signed Up Successfully",
-        is_success: true,
-        data: {
-          user: user
-        }
-      }, status: :ok
+      json_response "Signed Up Successfully", true, {user: user}, :ok
     else
-      render json: {
-        message: "Something Wrong",
-        is_success: false,
-        data: {}
-      }, status: :unprocessable_entity
-    end
+      json_response "Something Wrong", false, {}, :unprocessable_entity
+    end 
   end
 
   private
   def user_params
-    params.require(:user).permit(:email, :password, :password_cnofirmation)
+    params.require(:user).permit(:email, :password, :password_confirmation)
   end
 
   def ensure_params_exist
-    require if params[:user].present?
-    render json: {
-      message: "Missing Params",
-      is_success: false,
-      data: {}
-    }, status: :bad_request
+    return if params[:user].present?
+    json_response "Missing Params", false, {}, :bad_request
   end
 end
